@@ -3,8 +3,10 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class CompanyApp {
+    private static final String FILE_NAME = "employees.info";
+    private static Scanner userDataScanner = new Scanner(System.in);
     public static void main(String[] args) {
-        Scanner userDataScanner = new Scanner(System.in);
+
         System.out.println("Chcesz zapisać dane do pliku czy odczytać dane z pliku(odczyt/zapis)?");
         boolean error=true;
         while(error){
@@ -15,7 +17,7 @@ public class CompanyApp {
                         error = false;
                         break;
                     case "zapis":
-                        saveToFile(writeUserFile(userDataScanner));
+                        saveToFile(writeUserFile());
                         error = false;
                         break;
                     default:
@@ -35,6 +37,7 @@ public class CompanyApp {
     public static void readUserFile(){
         String fileName = "company.obj";
         Company company1 = null;
+        userDataScanner.close();
 
         try(
                 var fis = new FileInputStream(fileName);
@@ -48,50 +51,42 @@ public class CompanyApp {
 
         if (company1 != null){
             System.out.println("Wczytano dane: ");
-            int i = 0;
-            while(i < 3 && company1.getEmployees()[i] != null){
-                System.out.println("Pracownik " + (i+1) +" :");
-                System.out.println("Imię: " + company1.getEmployees()[i].getName());
-                System.out.println("Nazwisko: " + company1.getEmployees()[i].getSurname());
-                System.out.println("Wypłata: " + company1.getEmployees()[i].getSalary());
-                i++;
-            }
+            System.out.println(company1.toString());
+        } else {
+            System.out.println("Brak pracowników w pliku.");
         }
 
 
     }
 
-    public static Company writeUserFile(Scanner uDS){
+    public static Company writeUserFile(){
         Company company1 = new Company();
-        final int MAX_EMPLOYEES = 3;
         int employeeIndex = 0;
         boolean stillRead = true;
         boolean wannaContinue = true;
-        Employee[] employees = new Employee[MAX_EMPLOYEES];
 
         while(stillRead){
             try{
-                if(employeeIndex < MAX_EMPLOYEES){
-                    employees[employeeIndex] = new Employee();;
+                if(employeeIndex < Company.MAX_EMPLOYEES){
                     System.out.println("Wprowadź dane " + (employeeIndex+1) + " pracownika:");
                     System.out.println("Podaj imię:");
-                    employees[employeeIndex].setName(uDS.nextLine());
+                    String name = userDataScanner.nextLine();
                     System.out.println("Podaj nazwisko:");
-                    employees[employeeIndex].setSurname(uDS.nextLine());
+                    String surname = userDataScanner.nextLine();
                     System.out.println("Podaj wypłatę:");
-                    employees[employeeIndex].setSalary(uDS.nextDouble());
-                    uDS.nextLine();
+                    double salary = userDataScanner.nextDouble();
+                    userDataScanner.nextLine();
+                    company1.addEmployee(new Employee(name, surname, salary));
 
                     System.out.println("Czy chcesz wprowadzić więcej pracowników(tak/nie)?");
-                    String answer = uDS.nextLine();
+                    String answer = userDataScanner.nextLine();
                     wannaContinue = true;
                     while(wannaContinue){
                         try{
                             if(answer.equalsIgnoreCase("nie")) {
-                                company1.setEmployees(employees);
                                 wannaContinue = false;
                                 stillRead = false;
-                                uDS.close();
+                                userDataScanner.close();
                             } else if (answer.equalsIgnoreCase("tak")) {
                                 wannaContinue = false;
 
@@ -100,7 +95,7 @@ public class CompanyApp {
                             }
                         } catch (IllegalArgumentException e) {
                             System.out.println(e.getMessage());
-                            uDS.nextLine();
+                            userDataScanner.nextLine();
                         }
 
                     }
@@ -112,7 +107,7 @@ public class CompanyApp {
 
             } catch(InputMismatchException e){
                 System.out.println("Podaj właściwe wartości... Zacznij od nowa.");
-                uDS.nextLine();
+                userDataScanner.nextLine();
             } catch(ArrayIndexOutOfBoundsException e){
                 System.out.println(e.getMessage());
             }

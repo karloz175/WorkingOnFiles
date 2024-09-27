@@ -1,6 +1,4 @@
-import java.io.Serializable;
-
-public class Employee extends Person implements Serializable {
+public class Employee extends Person{
     private double salary;
 
     public Employee(String name, String surname, double salary) {
@@ -20,5 +18,10 @@ public class Employee extends Person implements Serializable {
 
     public void setSalary(double salary) {
         this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + salary + " zł";
     }
 }
