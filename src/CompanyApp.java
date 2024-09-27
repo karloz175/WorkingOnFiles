@@ -35,12 +35,11 @@ public class CompanyApp {
     }
 
     public static void readUserFile(){
-        String fileName = "company.obj";
         Company company1 = null;
         userDataScanner.close();
 
         try(
-                var fis = new FileInputStream(fileName);
+                var fis = new FileInputStream(FILE_NAME);
                 var ois = new ObjectInputStream(fis);
         ){
             company1 = (Company) ois.readObject();
@@ -79,10 +78,11 @@ public class CompanyApp {
                     company1.addEmployee(new Employee(name, surname, salary));
 
                     System.out.println("Czy chcesz wprowadzić więcej pracowników(tak/nie)?");
-                    String answer = userDataScanner.nextLine();
+                    String answer;
                     wannaContinue = true;
                     while(wannaContinue){
                         try{
+                            answer = userDataScanner.nextLine();
                             if(answer.equalsIgnoreCase("nie")) {
                                 wannaContinue = false;
                                 stillRead = false;
@@ -95,7 +95,6 @@ public class CompanyApp {
                             }
                         } catch (IllegalArgumentException e) {
                             System.out.println(e.getMessage());
-                            userDataScanner.nextLine();
                         }
 
                     }
@@ -117,16 +116,15 @@ public class CompanyApp {
 
     }
     public static void saveToFile(Company company){
-        String fileName = "company.obj";
         try(
-                var fs = new FileOutputStream(fileName);
+                var fs = new FileOutputStream(FILE_NAME);
                 var os = new ObjectOutputStream(fs);
         ){
             os.writeObject(company);
             System.out.println("Zapisano obiekt do pliku.");
 
         } catch(IOException e){
-            System.err.println("Błąd zapisu pliku " + fileName);
+            System.err.println("Błąd zapisu pliku " + FILE_NAME);
             e.printStackTrace();
         }
 
